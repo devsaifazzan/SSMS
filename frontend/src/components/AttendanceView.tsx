@@ -154,12 +154,12 @@ const AttendanceView = () => {
           <select 
             value={selectedTimetableId || ''}
             onChange={(e) => setSelectedTimetableId(Number(e.target.value))}
-            className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500"
+            className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 text-slate-700 text-xs font-semibold outline-none focus:ring-2 focus:ring-emerald-500/30"
           >
-            <option value="">Select Class/Subject</option>
-            {timetables.map(t => (
+            <option value="">Select Class Schedule...</option>
+            {timetables.map((t: any) => (
               <option key={t.id} value={t.id}>
-                Subject {t.subject_id} - Class {t.classroom} ({t.start_time})
+                {t.subject_name || `Subject ${t.subject_id}`} - {t.section_name || `Section ${t.section_id}`} ({t.classroom || 'Room 101'}) [{t.start_time}]
               </option>
             ))}
           </select>

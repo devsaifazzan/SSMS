@@ -34,7 +34,11 @@ class TimetableCreate(TimetableBase):
 
 class TimetableResponse(TimetableBase):
     id: int
+    section_name: Optional[str] = None
+    subject_name: Optional[str] = None
+    teacher_name: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
+
 
 class TimetableDetailResponse(TimetableResponse):
     subject: Optional[SubjectResponse] = None

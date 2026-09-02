@@ -152,6 +152,11 @@ class Timetable(Base):
     end_time: Mapped[time] = mapped_column(Time, nullable=False)
     classroom: Mapped[Optional[str]] = mapped_column(String(50))
 
+    section = relationship("Section")
+    subject = relationship("Subject")
+    teacher = relationship("TeacherProfile")
+
+
 class Attendance(Base):
     __tablename__ = "attendance"
     id: Mapped[int] = mapped_column(primary_key=True)

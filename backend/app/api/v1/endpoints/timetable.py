@@ -17,7 +17,14 @@ async def get_timetables(
     teacher_id: Optional[int] = Query(None, description="Filter by Teacher ID"),
     db: AsyncSession = Depends(get_db)
 ):
-    query = select(Timetable)
+    query = (
+        select(Timetable)
+        .options(
+            selectinload(Timetable.section),
+            selectinload(Timetable.subject),
+            selectinload(Timetable.teacher)
+        )
+    )
     
     if section_id is not None:
         query = query.filter(Timetable.section_id == section_id)
@@ -27,36 +34,27 @@ async def get_timetables(
     result = await db.execute(query)
     timetables = result.scalars().all()
     
-    # Normally we'd use selectinload to eagerly load relationships,
-    # but for a basic query, returning just the model dicts works
-    # if we don't need the nested objects. But let's load them for detail.
-    
-    return APIResponse(status="success", data=[TimetableResponse.model_validate(t) for t in timetables])
-
-@router.get("/detailed", response_model=APIResponse)
-async def get_detailed_timetables(
-    section_id: Optional[int] = Query(None, description="Filter by Section ID"),
-    teacher_id: Optional[int] = Query(None, description="Filter by Teacher ID"),
-    db: AsyncSession = Depends(get_db)
-):
-    query = select(Timetable)
-    
-    if section_id is not None:
-        query = query.filter(Timetable.section_id == section_id)
-    if teacher_id is not None:
-        query = query.filter(Timetable.teacher_id == teacher_id)
+    response_data = []
+    for t in timetables:
+        sec_name = t.section.name if t.section else f"Section #{t.section_id}"
+        sub_name = t.subject.name if t.subject else f"Subject #{t.subject_id}"
+        teach_name = f"{t.teacher.first_name} {t.teacher.last_name}" if t.teacher else f"Teacher #{t.teacher_id}"
         
-    result = await db.execute(query)
-    timetables = result.scalars().all()
+        response_data.append({
+            "id": t.id,
+            "section_id": t.section_id,
+            "subject_id": t.subject_id,
+            "teacher_id": t.teacher_id,
+            "day_of_week": t.day_of_week,
+            "start_time": t.start_time.strftime("%H:%M:%S") if hasattr(t.start_time, "strftime") else str(t.start_time),
+            "end_time": t.end_time.strftime("%H:%M:%S") if hasattr(t.end_time, "strftime") else str(t.end_time),
+            "classroom": t.classroom or "Room 101",
+            "section_name": sec_name,
+            "subject_name": sub_name,
+            "teacher_name": teach_name
+        })
     
-    # In a real app we'd want to use selectinload for relationships.
-    # We will fetch manually to keep it simple or just return the IDs.
-    # To support detailed, we need relationship attributes on the SQLAlchemy model.
-    # Looking at domain.py, Timetable does NOT have relationships defined for subject, teacher, section.
-    # Since we can't easily change the model without migrations/impact, we'll return basic timetable data for now,
-    # and let the frontend map it if needed, or we'll fetch them individually.
-    
-    return APIResponse(status="success", data=[TimetableResponse.model_validate(t) for t in timetables])
+    return APIResponse(status="success", data=response_data)
 
 @router.post("/", response_model=APIResponse)
 async def create_timetable(timetable_in: TimetableCreate, db: AsyncSession = Depends(get_db)):
@@ -65,3 +63,4 @@ async def create_timetable(timetable_in: TimetableCreate, db: AsyncSession = Dep
     await db.commit()
     await db.refresh(new_timetable)
     return APIResponse(status="success", data=TimetableResponse.model_validate(new_timetable))
+
