@@ -160,12 +160,33 @@ class PaymentResponse(PaymentBase):
     payment_date: datetime
     model_config = ConfigDict(from_attributes=True)
 
-# --- Grades Schemas ---
+# --- Grades & Exams Schemas ---
+class ExamScheduleBase(BaseModel):
+    title: str
+    subject_id: int
+    section_id: Optional[int] = None
+    exam_type_id: int
+    exam_date: date
+    start_time: str
+    end_time: str
+    max_marks: float = 100.0
+    room: Optional[str] = None
+
+class ExamScheduleCreate(ExamScheduleBase):
+    pass
+
+class ExamScheduleResponse(ExamScheduleBase):
+    id: int
+    subject_name: Optional[str] = None
+    section_name: Optional[str] = None
+    exam_type_name: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True)
+
 class MarkBase(BaseModel):
     student_id: int
     subject_id: int
     exam_type_id: int
-    term_id: int
+    term_id: Optional[int] = None
     score: float
     max_score: float = 100.0
 
@@ -174,7 +195,12 @@ class MarkCreate(MarkBase):
 
 class MarkResponse(MarkBase):
     id: int
+    student_name: Optional[str] = None
+    subject_name: Optional[str] = None
+    exam_type_name: Optional[str] = None
+    grade_letter: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
+
 
 # --- Academics Schemas ---
 class SubjectBase(BaseModel):

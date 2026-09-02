@@ -176,7 +176,24 @@ class ExamType(Base):
     __tablename__ = "exam_types"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    weight_percentage: Mapped[float] = mapped_column(Float, nullable=False)
+    weight_percentage: Mapped[float] = mapped_column(Float, default=100.0)
+
+class ExamSchedule(Base):
+    __tablename__ = "exam_schedules"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    subject_id: Mapped[int] = mapped_column(ForeignKey("subjects.id"))
+    section_id: Mapped[Optional[int]] = mapped_column(ForeignKey("sections.id"))
+    exam_type_id: Mapped[int] = mapped_column(ForeignKey("exam_types.id"))
+    exam_date: Mapped[date] = mapped_column(Date, nullable=False)
+    start_time: Mapped[str] = mapped_column(String(20), nullable=False)
+    end_time: Mapped[str] = mapped_column(String(20), nullable=False)
+    max_marks: Mapped[float] = mapped_column(Float, default=100.0)
+    room: Mapped[Optional[str]] = mapped_column(String(50))
+
+    subject = relationship("Subject")
+    section = relationship("Section")
+    exam_type = relationship("ExamType")
 
 class Mark(Base):
     __tablename__ = "marks"
@@ -184,9 +201,14 @@ class Mark(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey("student_profiles.id"))
     subject_id: Mapped[int] = mapped_column(ForeignKey("subjects.id"))
     exam_type_id: Mapped[int] = mapped_column(ForeignKey("exam_types.id"))
-    term_id: Mapped[int] = mapped_column(ForeignKey("terms.id"))
+    term_id: Mapped[Optional[int]] = mapped_column(ForeignKey("terms.id"))
     score: Mapped[float] = mapped_column(Float, nullable=False)
     max_score: Mapped[float] = mapped_column(Float, default=100.00)
+
+    student = relationship("StudentProfile")
+    subject = relationship("Subject")
+    exam_type = relationship("ExamType")
+
 
 class FeeType(Base):
     __tablename__ = "fee_types"
