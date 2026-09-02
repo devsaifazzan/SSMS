@@ -37,8 +37,37 @@ async def get_teachers(db: AsyncSession = Depends(get_db)):
 @router.post("/teachers", response_model=APIResponse)
 async def create_teacher(teacher_in: TeacherProfileCreate, db: AsyncSession = Depends(get_db)):
     dump_data = teacher_in.model_dump()
+    
+    # Auto-create User account if user_id is not provided
+    if not dump_data.get('user_id'):
+        role_result = await db.execute(select(Role).filter(Role.name == "Teacher"))
+        teacher_role = role_result.scalars().first()
+        role_id = teacher_role.id if teacher_role else 2
+        
+        email = dump_data.get('email') or f"teacher_{dump_data['first_name'].lower()}_{dump_data['last_name'].lower()}@ssms.edu"
+        username_base = (dump_data.get('email', '').split('@')[0] if dump_data.get('email') else f"{dump_data['first_name'].lower()}{dump_data['last_name'].lower()}").strip()
+        username = username_base
+        
+        existing_user = await db.execute(select(User).filter(User.username == username))
+        if existing_user.scalars().first():
+            username = f"{username_base}_{int(datetime.now().timestamp())}"
+            
+        hashed_password = get_password_hash("teacher123")
+        new_user = User(
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
+            role_id=role_id
+        )
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        dump_data['user_id'] = new_user.id
+        dump_data['email'] = email
+        
     if dump_data.get('hire_date') is None:
         del dump_data['hire_date']
+        
     new_teacher = TeacherProfile(**dump_data)
     db.add(new_teacher)
     await db.commit()

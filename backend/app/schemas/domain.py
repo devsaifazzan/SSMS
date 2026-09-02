@@ -191,15 +191,24 @@ class SubjectResponse(SubjectBase):
 class TeacherProfileBase(BaseModel):
     first_name: str
     last_name: str
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    gender: Optional[str] = None
+    national_id: Optional[str] = None
+    specialization: Optional[str] = None
+    qualification: Optional[str] = None
+    experience_years: Optional[int] = 0
+    address: Optional[str] = None
+    status: Optional[str] = "Active"
 
 class TeacherProfileCreate(TeacherProfileBase):
-    user_id: int
+    user_id: Optional[int] = None
     hire_date: Optional[date] = None
 
 class TeacherProfileResponse(TeacherProfileBase):
     id: int
-    user_id: int
-    hire_date: date
+    user_id: Optional[int] = None
+    hire_date: Optional[date] = None
     model_config = ConfigDict(from_attributes=True)
 
 class ClassLevelBase(BaseModel):

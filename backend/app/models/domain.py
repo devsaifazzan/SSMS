@@ -111,9 +111,18 @@ class ParentProfile(Base):
 class TeacherProfile(Base):
     __tablename__ = "teacher_profiles"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), unique=True)
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[Optional[str]] = mapped_column(String(255))
+    phone_number: Mapped[Optional[str]] = mapped_column(String(20))
+    gender: Mapped[Optional[str]] = mapped_column(String(20))
+    national_id: Mapped[Optional[str]] = mapped_column(String(50))
+    specialization: Mapped[Optional[str]] = mapped_column(String(100))
+    qualification: Mapped[Optional[str]] = mapped_column(String(100))
+    experience_years: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    address: Mapped[Optional[str]] = mapped_column(Text)
+    status: Mapped[Optional[str]] = mapped_column(String(20), default="Active")
     hire_date: Mapped[date] = mapped_column(Date, server_default=func.current_date())
 
 class Enrollment(Base):
