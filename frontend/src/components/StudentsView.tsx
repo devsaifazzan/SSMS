@@ -127,81 +127,160 @@ const StudentsView: React.FC = () => {
         <StudentTable key={refreshKey} />
       </div>
 
-      {/* Add Student Modal */}
+      {/* Spacious & Professional Add Student Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-slate-800">Add New Student</h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto font-sans">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto my-auto border border-slate-200">
+            <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-100">
+              <div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-800 flex items-center">
+                  <UserPlus className="w-6 h-6 mr-2.5 text-emerald-600 shrink-0" />
+                  Add New Student
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">Fill in complete account, personal, academic enrollment, and health details for the student.</p>
+              </div>
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">
+                {error}
+              </div>
+            )}
 
-            <form onSubmit={handleAddStudent} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-              {/* Account Info */}
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-slate-800 border-b pb-1 mb-3">Account Information</h4>
-                <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleAddStudent} className="space-y-6">
+              {/* Section 1: Account Information */}
+              <div>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">
+                  1. Account Credentials
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Username</label>
-                    <input required type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Username *</label>
+                    <input 
+                      required 
+                      type="text" 
+                      placeholder="e.g. john_doe"
+                      value={username} 
+                      onChange={e => setUsername(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                    <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
+                    <input 
+                      required 
+                      type="email" 
+                      placeholder="e.g. student@school.edu"
+                      value={email} 
+                      onChange={e => setEmail(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                    <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Password *</label>
+                    <input 
+                      required 
+                      type="password" 
+                      placeholder="••••••••"
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Personal Info */}
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-slate-800 border-b pb-1 mb-3">Personal Information</h4>
-                <div className="grid grid-cols-2 gap-4">
+              {/* Section 2: Personal Information */}
+              <div>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">
+                  2. Personal Information
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">First Name</label>
-                    <input required type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
+                    <input 
+                      required 
+                      type="text" 
+                      placeholder="e.g. Alice"
+                      value={firstName} 
+                      onChange={e => setFirstName(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
-                    <input required type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
+                    <input 
+                      required 
+                      type="text" 
+                      placeholder="e.g. Johnson"
+                      value={lastName} 
+                      onChange={e => setLastName(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Date of Birth</label>
-                    <input type="date" value={dateOfBirth} onChange={e => setDateOfBirth(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Gender</label>
-                    <select value={gender} onChange={e => setGender(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select...</option>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
+                    <select 
+                      value={gender} 
+                      onChange={e => setGender(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
+                    >
+                      <option value="">Select Gender...</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">National ID</label>
-                    <input type="text" value={nationalId} onChange={e => setNationalId(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Date of Birth</label>
+                    <input 
+                      type="date" 
+                      value={dateOfBirth} 
+                      onChange={e => setDateOfBirth(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Enrollment Date</label>
-                    <input type="date" value={enrollmentDate} onChange={e => setEnrollmentDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">National ID</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 1098765432"
+                      value={nationalId} 
+                      onChange={e => setNationalId(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Enrollment Date</label>
+                    <input 
+                      type="date" 
+                      value={enrollmentDate} 
+                      onChange={e => setEnrollmentDate(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Enrollment Info */}
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-slate-800 border-b pb-1 mb-3">Enrollment Information</h4>
-                <div className="grid grid-cols-2 gap-4">
+              {/* Section 3: Academic Enrollment */}
+              <div>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">
+                  3. Academic Enrollment
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Academic Year</label>
-                    <select required value={selectedAcademicYearId} onChange={e => setSelectedAcademicYearId(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Academic Year *</label>
+                    <select 
+                      required 
+                      value={selectedAcademicYearId} 
+                      onChange={e => setSelectedAcademicYearId(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
+                    >
                       <option value="">Select Academic Year...</option>
                       {academicYears.map((y: any) => (
                         <option key={y.id} value={y.id}>{y.name}</option>
@@ -209,40 +288,48 @@ const StudentsView: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Section / Class</label>
-                    <select required value={selectedSectionId} onChange={e => setSelectedSectionId(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select Section...</option>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Section / Class *</label>
+                    <select 
+                      required 
+                      value={selectedSectionId} 
+                      onChange={e => setSelectedSectionId(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
+                    >
+                      <option value="">Select Section / Class...</option>
                       {sections.map((s: any) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
+                        <option key={s.id} value={s.id}>
+                          {s.class_level?.name ? `${s.class_level.name} - ${s.name}` : s.name}
+                        </option>
                       ))}
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* Contact Info */}
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-slate-800 border-b pb-1 mb-3">Contact Information</h4>
-                <div className="grid grid-cols-2 gap-4">
+              {/* Section 4: Contact & Medical */}
+              <div>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">
+                  4. Contact & Health Details
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
-                    <input type="text" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                    <input 
+                      type="tel" 
+                      placeholder="e.g. +1 555 987 6543"
+                      value={phoneNumber} 
+                      onChange={e => setPhoneNumber(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
-                    <textarea value={address} onChange={e => setAddress(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" rows={2} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Medical Info */}
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-slate-800 border-b pb-1 mb-3">Medical Information</h4>
-                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Blood Type</label>
-                    <select value={bloodType} onChange={e => setBloodType(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select...</option>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Blood Type</label>
+                    <select 
+                      value={bloodType} 
+                      onChange={e => setBloodType(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
+                    >
+                      <option value="">Select Blood Type...</option>
                       <option value="A+">A+</option>
                       <option value="A-">A-</option>
                       <option value="B+">B+</option>
@@ -253,17 +340,43 @@ const StudentsView: React.FC = () => {
                       <option value="O-">O-</option>
                     </select>
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Medical Conditions / Allergies</label>
-                    <textarea value={medicalConditions} onChange={e => setMedicalConditions(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" rows={2} />
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Residential Address</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 123 School Street, City"
+                      value={address} 
+                      onChange={e => setAddress(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Medical Conditions / Allergies</label>
+                    <textarea 
+                      placeholder="Enter any relevant medical notes, allergies, or emergency conditions..."
+                      value={medicalConditions} 
+                      onChange={e => setMedicalConditions(e.target.value)} 
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" 
+                      rows={2} 
+                    />
                   </div>
                 </div>
               </div>
-              <div className="pt-4 flex justify-end space-x-3">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
+
+              {/* Action Buttons */}
+              <div className="pt-4 flex justify-end space-x-3 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  className="px-5 py-2.5 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 font-medium text-sm transition-colors"
+                >
                   Cancel
                 </button>
-                <button type="submit" disabled={loading} className="btn-primary flex items-center">
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="btn-primary bg-emerald-600 hover:bg-emerald-700 shadow-md text-white font-semibold py-2.5 px-6 rounded-xl flex items-center text-sm transition-all"
+                >
                   {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Save Student
                 </button>
