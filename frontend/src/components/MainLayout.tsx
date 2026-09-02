@@ -37,8 +37,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onLogout }) => {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300">
         <div className="h-16 flex items-center px-6 border-b border-slate-700/50">
-          <GraduationCap className="w-8 h-8 text-blue-500 mr-3" />
-          <span className="text-xl font-bold text-white tracking-wide">SSMS</span>
+          <img src="/logo.png" alt="SSMS Logo" className="w-9 h-9 rounded-lg mr-3 object-contain" />
+          <span className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-lime-300 tracking-wide">SSMS</span>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">

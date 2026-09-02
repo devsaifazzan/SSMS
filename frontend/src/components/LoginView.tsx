@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GraduationCap, Loader2 } from 'lucide-react';
+import { Loader2, User, Lock, Eye, EyeOff, Sparkles, ShieldCheck } from 'lucide-react';
 import client from '../api/client';
 
 interface LoginViewProps {
@@ -9,6 +9,7 @@ interface LoginViewProps {
 const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,7 +23,6 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       formData.append('username', username);
       formData.append('password', password);
       
-      // The auth endpoint uses OAuth2PasswordRequestForm, which expects form data
       const response = await client.post('/auth/login', formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -35,98 +35,158 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       }
     } catch (err: any) {
       console.error('Login error', err);
-      setError('Invalid username or password');
+      setError('Invalid username or password / اسم المستخدم أو كلمة المرور غير صحيحة');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleQuickLogin = (u: string, p: string) => {
+    setUsername(u);
+    setPassword(p);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <GraduationCap className="w-12 h-12 text-blue-600" />
+    <div className="min-h-screen relative overflow-hidden bg-slate-950 flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans">
+      {/* Dynamic Animated Background Gradients & Ambient Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-500/20 blur-[120px] pointer-events-none animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-lime-500/20 blur-[120px] pointer-events-none animate-pulse" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-teal-600/10 blur-[160px] pointer-events-none" />
+
+      {/* Main Glassmorphic Container Card */}
+      <div className="relative w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-emerald-950/50 z-10 transition-all duration-300">
+        
+        {/* Logo & Header Section */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="relative group mb-4">
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-lime-400 rounded-3xl blur opacity-75 group-hover:opacity-100 transition duration-500" />
+            <img 
+              src="/logo.png" 
+              alt="SSMS Logo" 
+              className="relative w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-2xl drop-shadow-xl transform group-hover:scale-105 transition-all duration-300" 
+            />
+          </div>
+          
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-lime-300 to-teal-200 tracking-tight">
+            SSMS
+          </h1>
+          <p className="text-sm font-semibold text-emerald-400/90 mt-1">
+            Smart School Management System
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5">
+            نظام إدارة المدارس الذكي
+          </p>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
-          Sign in to your account
-        </h2>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 text-sm text-red-700">
-                {error}
+        {/* Form Error Alert */}
+        {error && (
+          <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs sm:text-sm flex items-start space-x-2 animate-shake">
+            <ShieldCheck className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Username Field */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              Username or Email / اسم المستخدم
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <User className="w-5 h-5 text-emerald-500/80" />
               </div>
-            )}
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-slate-700">
-                Username or Email
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="e.g. admin"
+                className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Password / كلمة المرور
               </label>
-              <div className="mt-1">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <Lock className="w-5 h-5 text-emerald-500/80" />
               </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-900">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot your password?
-                </a>
-              </div>
-            </div>
-
-            <div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full pl-11 pr-11 py-3 bg-slate-950/60 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition-all duration-200"
+              />
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 transition-colors"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                Sign in
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-          </form>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full relative group overflow-hidden py-3.5 px-6 rounded-xl font-bold text-slate-950 bg-gradient-to-r from-emerald-400 via-lime-400 to-teal-400 hover:from-emerald-300 hover:to-lime-300 shadow-lg shadow-emerald-500/25 active:scale-[0.99] transition-all duration-200 flex items-center justify-center text-sm disabled:opacity-70"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin mr-2 text-slate-950" />
+                <span>Logging in... / جاري الدخول</span>
+              </>
+            ) : (
+              <span className="flex items-center">
+                Sign In / تسجيل الدخول
+              </span>
+            )}
+          </button>
+        </form>
+
+        {/* Quick Demo Fill Options */}
+        <div className="mt-8 pt-6 border-t border-slate-800/80">
+          <div className="flex items-center justify-center space-x-1.5 text-xs text-slate-400 mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Quick Demo Accounts / حسابات التجربة</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <button
+              onClick={() => handleQuickLogin('admin', 'admin123')}
+              className="py-2 px-2 rounded-lg bg-slate-800/60 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700/60 hover:border-emerald-500/40 font-medium transition-all text-center"
+            >
+              👑 Admin
+            </button>
+            <button
+              onClick={() => handleQuickLogin('teacher1', 'teacher123')}
+              className="py-2 px-2 rounded-lg bg-slate-800/60 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700/60 hover:border-emerald-500/40 font-medium transition-all text-center"
+            >
+              👨‍🏫 Teacher
+            </button>
+            <button
+              onClick={() => handleQuickLogin('alice', 'alice123')}
+              className="py-2 px-2 rounded-lg bg-slate-800/60 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-700/60 hover:border-emerald-500/40 font-medium transition-all text-center"
+            >
+              🎓 Student
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 text-center text-xs text-slate-500">
+          SSMS &copy; {new Date().getFullYear()} All Rights Reserved
         </div>
       </div>
     </div>
