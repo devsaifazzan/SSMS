@@ -86,7 +86,7 @@ const TeachersView: React.FC = () => {
         <div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 flex items-center">
             <Users className="w-7 h-7 mr-2.5 text-emerald-600 shrink-0" />
-            Teachers Directory / دليل المعلمين
+            Teachers Directory
           </h2>
           <p className="text-xs text-slate-500 mt-1">Manage teaching staff profiles, academic qualifications, and contact information.</p>
         </div>
@@ -94,7 +94,7 @@ const TeachersView: React.FC = () => {
           onClick={() => setIsModalOpen(true)} 
           className="btn-primary bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 text-white font-semibold py-2.5 px-5 rounded-xl transition-all"
         >
-          + Add New Teacher / إضافة معلم جديد
+          + Add New Teacher
         </button>
       </div>
 
@@ -191,7 +191,7 @@ const TeachersView: React.FC = () => {
               <div>
                 <h3 className="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center">
                   <UserCheck className="w-6 h-6 mr-2 text-emerald-600" />
-                  Add New Teacher Profile / إضافة معلم جديد
+                  Add New Teacher Profile
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">Enter complete personal, contact, and academic details for the staff profile.</p>
               </div>
@@ -206,43 +206,43 @@ const TeachersView: React.FC = () => {
             <form onSubmit={handleAddTeacher} className="space-y-6">
               {/* Section 1: Personal Details */}
               <div>
-                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">1. Personal Information / البيانات الشخصية</h4>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">1. Personal Information</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">First Name / الاسم الأول *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
                     <input 
                       type="text" 
                       required
-                      placeholder="e.g. John / أحمد"
+                      placeholder="e.g. John"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.first_name}
                       onChange={(e) => setNewTeacher({...newTeacher, first_name: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name / اسم العائلة *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
                     <input 
                       type="text" 
                       required
-                      placeholder="e.g. Doe / العتيبي"
+                      placeholder="e.g. Doe"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.last_name}
                       onChange={(e) => setNewTeacher({...newTeacher, last_name: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Gender / الجنس</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
                     <select 
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
                       value={newTeacher.gender}
                       onChange={(e) => setNewTeacher({...newTeacher, gender: e.target.value})}
                     >
-                      <option value="Male">Male / ذكر</option>
-                      <option value="Female">Female / أنثى</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">National ID / رقم الهوية الوطنية</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">National ID</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 1029384756"
@@ -256,10 +256,10 @@ const TeachersView: React.FC = () => {
 
               {/* Section 2: Contact Info */}
               <div>
-                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">2. Contact Information / بيانات التواصل</h4>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">2. Contact Information</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address / البريد الإلكتروني</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
                     <input 
                       type="email" 
                       placeholder="e.g. teacher@school.edu"
@@ -269,10 +269,10 @@ const TeachersView: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number / رقم الهاتف</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
                     <input 
                       type="tel" 
-                      placeholder="e.g. +966 50 123 4567"
+                      placeholder="e.g. +1 555 123 4567"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.phone_number}
                       onChange={(e) => setNewTeacher({...newTeacher, phone_number: e.target.value})}
@@ -280,10 +280,10 @@ const TeachersView: React.FC = () => {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Residential Address / العنوان السكني</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Residential Address</label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Building 12, King Fahd Road, Riyadh"
+                    placeholder="e.g. Building 12, Main Street, City"
                     className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                     value={newTeacher.address}
                     onChange={(e) => setNewTeacher({...newTeacher, address: e.target.value})}
@@ -293,10 +293,10 @@ const TeachersView: React.FC = () => {
 
               {/* Section 3: Professional & Employment Info */}
               <div>
-                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">3. Professional & Employment Details / البيانات الوظيفية والاكاديمية</h4>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">3. Professional & Employment Details</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Specialization / Subject / التخصص</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Specialization / Subject</label>
                     <input 
                       type="text" 
                       placeholder="e.g. Mathematics, Science, English"
@@ -306,20 +306,20 @@ const TeachersView: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Qualification / المؤهل العلمي</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Qualification</label>
                     <select 
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
                       value={newTeacher.qualification}
                       onChange={(e) => setNewTeacher({...newTeacher, qualification: e.target.value})}
                     >
-                      <option value="Bachelor's Degree">Bachelor's Degree / بكالوريوس</option>
-                      <option value="Master's Degree">Master's Degree / ماجستير</option>
-                      <option value="PhD / Doctorate">PhD / الدكتوراه</option>
-                      <option value="Diploma">Diploma / دبلوم</option>
+                      <option value="Bachelor's Degree">Bachelor's Degree</option>
+                      <option value="Master's Degree">Master's Degree</option>
+                      <option value="PhD / Doctorate">PhD / Doctorate</option>
+                      <option value="Diploma">Diploma</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Years of Experience / سنوات الخبرة</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Years of Experience</label>
                     <input 
                       type="number" 
                       min="0"
@@ -329,7 +329,7 @@ const TeachersView: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Hire Date / تاريخ التعيين</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Hire Date</label>
                     <input 
                       type="date" 
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
@@ -347,7 +347,7 @@ const TeachersView: React.FC = () => {
                   onClick={() => setIsModalOpen(false)} 
                   className="px-5 py-2.5 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 font-medium text-sm transition-colors"
                 >
-                  Cancel / إلغاء
+                  Cancel
                 </button>
                 <button 
                   type="submit" 
@@ -355,7 +355,7 @@ const TeachersView: React.FC = () => {
                   className="btn-primary bg-emerald-600 hover:bg-emerald-700 shadow-md text-white font-semibold py-2.5 px-6 rounded-xl flex items-center text-sm transition-all"
                 >
                   {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Save Teacher / حفظ بيانات المعلم
+                  Save Teacher
                 </button>
               </div>
             </form>

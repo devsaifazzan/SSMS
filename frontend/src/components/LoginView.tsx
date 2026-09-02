@@ -73,9 +73,6 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           <p className="text-sm font-semibold text-emerald-400/90 mt-1">
             Smart School Management System
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">
-            نظام إدارة المدارس الذكي
-          </p>
         </div>
 
         {/* Form Error Alert */}
@@ -91,7 +88,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           {/* Username Field */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Username or Email / اسم المستخدم
+              Username or Email
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -112,7 +109,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                Password / كلمة المرور
+                Password
               </label>
             </div>
             <div className="relative">
@@ -146,11 +143,11 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2 text-slate-950" />
-                <span>Logging in... / جاري الدخول</span>
+                <span>Logging in...</span>
               </>
             ) : (
               <span className="flex items-center">
-                Sign In / تسجيل الدخول
+                Sign In
               </span>
             )}
           </button>
@@ -160,7 +157,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         <div className="mt-8 pt-6 border-t border-slate-800/80">
           <div className="flex items-center justify-center space-x-1.5 text-xs text-slate-400 mb-3">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Quick Demo Accounts / حسابات التجربة</span>
+            <span>Quick Demo Accounts</span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-xs">
             <button
