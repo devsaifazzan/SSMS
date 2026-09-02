@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ssms_db
+    restart: always
+    environment:
+      POSTGRES_USER: ssms_user
+      POSTGRES_PASSWORD: ssms_password
+      POSTGRES_DB: ssms_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ssms_backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ssms_user:ssms_password@db:5432/ssms_db
+      SECRET_KEY: "super_secret_key_change_in_production"
+      GEMINI_API_KEY: "your_gemini_api_key_here"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ssms_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
