@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 
 from app.core.database import get_db
 from app.core.security import verify_password, create_access_token, get_password_hash, get_current_user_with_role
-from app.models.domain import User
+from app.models.domain import User, Role
 from app.schemas.domain import Token, UserResponse, UserCreate, APIResponse, UserUpdate, PasswordUpdate
 
 router = APIRouter()
@@ -29,12 +29,18 @@ async def register_user(user_in: UserCreate, db: AsyncSession = Depends(get_db))
     if result.scalars().first():
         raise HTTPException(status_code=400, detail="Username or email already registered")
         
+    role_id = user_in.role_id
+    if not role_id:
+        role_result = await db.execute(select(Role).filter(Role.name == "Student"))
+        student_role = role_result.scalars().first()
+        role_id = student_role.id if student_role else 3
+
     hashed_password = get_password_hash(user_in.password)
     new_user = User(
         username=user_in.username,
         email=user_in.email,
         hashed_password=hashed_password,
-        role_id=user_in.role_id
+        role_id=role_id
     )
     db.add(new_user)
     await db.commit()

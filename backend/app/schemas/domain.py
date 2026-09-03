@@ -17,7 +17,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    role_id: int
+    role_id: Optional[int] = None
 
 class UserResponse(UserBase):
     id: int

@@ -42,21 +42,36 @@ const StudentsView: React.FC = () => {
     }
   }, [showModal]);
 
+  const formatErrorMsg = (err: any): string => {
+    const detail = err.response?.data?.detail || err.response?.data?.error;
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+      return detail.map((d: any) => (typeof d === 'string' ? d : d.msg || JSON.stringify(d))).join(', ');
+    }
+    if (typeof detail === 'object' && detail !== null) {
+      return JSON.stringify(detail);
+    }
+    return err.message || "Failed to create student";
+  };
+
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // 1. Create User
+      // 1. Create User Account
       const userRes = await client.post('/auth/register', {
         username,
         email,
         password,
-        role: 'Student'
+        role_id: 3 // Student Role
       });
       
-      const userId = userRes.data.data.id;
+      const userId = userRes.data?.data?.id || userRes.data?.id;
+      if (!userId) {
+        throw new Error("User registration failed: User ID missing in response.");
+      }
 
       // 2. Create Student Profile
       const studentRes = await client.post('/students/', {
@@ -70,6 +85,7 @@ const StudentsView: React.FC = () => {
         address: address || null,
         phone_number: phoneNumber || null,
         medical_conditions: medicalConditions || null,
+        status: 'Active',
         user_id: userId
       });
       
@@ -81,7 +97,7 @@ const StudentsView: React.FC = () => {
           student_id: studentId,
           academic_year_id: parseInt(selectedAcademicYearId),
           section_id: parseInt(selectedSectionId)
-        });
+        }).catch(err => console.error("Enrollment error (non-fatal):", err));
       }
 
       setShowModal(false);
@@ -104,7 +120,8 @@ const StudentsView: React.FC = () => {
       setSelectedAcademicYearId('');
       setSelectedSectionId('');
     } catch (err: any) {
-      setError(err.response?.data?.detail || err.response?.data?.error || "Failed to create student");
+      console.error("Error creating student:", err);
+      setError(formatErrorMsg(err));
     } finally {
       setLoading(false);
     }
