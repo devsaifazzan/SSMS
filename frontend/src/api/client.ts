@@ -1,12 +1,14 @@
 import axios from 'axios';
 
+const DEFAULT_RENDER_BACKEND = 'https://ssms-backend-v03k.onrender.com/api/v1';
+
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
-  // If deployed on Vercel / remote host and no env var provided, use current host protocol/origin
+  // If running in browser on production host (Vercel), default to live Render backend URL
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return `${window.location.origin}/api/v1`;
+    return DEFAULT_RENDER_BACKEND;
   }
   return 'http://localhost:8000/api/v1';
 };
