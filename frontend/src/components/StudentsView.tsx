@@ -43,6 +43,9 @@ const StudentsView: React.FC = () => {
   }, [showModal]);
 
   const formatErrorMsg = (err: any): string => {
+    if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.response) {
+      return "تعذر الاتصال بالخادم (Network Error). إذا كنت تستخدم Vercel، يرجى التأكد من تشغيل خادم الباك إند وتعيين VITE_API_BASE_URL في إعدادات Vercel Environment Variables.";
+    }
     const detail = err.response?.data?.detail || err.response?.data?.error;
     if (typeof detail === 'string') return detail;
     if (Array.isArray(detail)) {
