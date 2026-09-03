@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
@@ -6,7 +6,7 @@ from app.core.database import get_db
 from app.models.domain import Subject, TeacherProfile, ClassLevel, Section, AcademicYear, Enrollment, StudentProfile
 from app.schemas.domain import (
     APIResponse, SubjectResponse, TeacherProfileResponse, ClassLevelResponse, SectionResponse,
-    SubjectCreate, TeacherProfileCreate, ClassLevelCreate, SectionCreate,
+    SubjectCreate, TeacherProfileCreate, TeacherProfileUpdate, ClassLevelCreate, SectionCreate,
     AcademicYearResponse, EnrollmentResponse, StudentPromotionRequest,
     AcademicYearCreate, EnrollmentCreate
 )
@@ -73,6 +73,32 @@ async def create_teacher(teacher_in: TeacherProfileCreate, db: AsyncSession = De
     await db.commit()
     await db.refresh(new_teacher)
     return APIResponse(status="success", data=TeacherProfileResponse.model_validate(new_teacher))
+
+@router.put("/teachers/{teacher_id}", response_model=APIResponse)
+async def update_teacher(teacher_id: int, teacher_in: TeacherProfileUpdate, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(TeacherProfile).filter(TeacherProfile.id == teacher_id))
+    teacher = result.scalars().first()
+    if not teacher:
+        raise HTTPException(status_code=404, detail="Teacher profile not found")
+    
+    update_data = teacher_in.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(teacher, key, value)
+        
+    await db.commit()
+    await db.refresh(teacher)
+    return APIResponse(status="success", data=TeacherProfileResponse.model_validate(teacher))
+
+@router.delete("/teachers/{teacher_id}", response_model=APIResponse)
+async def delete_teacher(teacher_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(TeacherProfile).filter(TeacherProfile.id == teacher_id))
+    teacher = result.scalars().first()
+    if not teacher:
+        raise HTTPException(status_code=404, detail="Teacher profile not found")
+        
+    await db.delete(teacher)
+    await db.commit()
+    return APIResponse(status="success", data={"message": "Teacher deleted successfully"})
 
 @router.get("/class_levels", response_model=APIResponse)
 async def get_class_levels(db: AsyncSession = Depends(get_db)):

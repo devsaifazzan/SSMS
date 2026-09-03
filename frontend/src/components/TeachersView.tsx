@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Loader2, X, Mail, Phone, BookOpen, UserCheck } from 'lucide-react';
+import { Users, Search, Loader2, X, Mail, Phone, BookOpen, UserCheck, Edit, Trash2 } from 'lucide-react';
 import client from '../api/client';
 
 const TeachersView: React.FC = () => {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   
-  const [newTeacher, setNewTeacher] = useState({
+  // Modals state
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const defaultTeacherState = {
     first_name: '',
     last_name: '',
     email: '',
@@ -22,7 +26,9 @@ const TeachersView: React.FC = () => {
     address: '',
     status: 'Active',
     hire_date: new Date().toISOString().split('T')[0]
-  });
+  };
+
+  const [newTeacher, setNewTeacher] = useState(defaultTeacherState);
 
   const fetchTeachers = async () => {
     setLoading(true);
@@ -50,21 +56,8 @@ const TeachersView: React.FC = () => {
         ...newTeacher,
         experience_years: Number(newTeacher.experience_years)
       });
-      setIsModalOpen(false);
-      setNewTeacher({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone_number: '',
-        gender: 'Male',
-        national_id: '',
-        specialization: 'Mathematics',
-        qualification: "Bachelor's Degree",
-        experience_years: 1,
-        address: '',
-        status: 'Active',
-        hire_date: new Date().toISOString().split('T')[0]
-      });
+      setIsAddModalOpen(false);
+      setNewTeacher(defaultTeacherState);
       fetchTeachers();
     } catch (err) {
       console.error("Failed to add teacher", err);
@@ -73,25 +66,74 @@ const TeachersView: React.FC = () => {
     }
   };
 
-  const filteredTeachers = teachers.filter((t: any) => 
+  const handleOpenEditModal = (teacher: any) => {
+    setEditingTeacher({
+      id: teacher.id,
+      first_name: teacher.first_name || '',
+      last_name: teacher.last_name || '',
+      email: teacher.email || '',
+      phone_number: teacher.phone_number || '',
+      gender: teacher.gender || 'Male',
+      national_id: teacher.national_id || '',
+      specialization: teacher.specialization || 'Mathematics',
+      qualification: teacher.qualification || "Bachelor's Degree",
+      experience_years: teacher.experience_years || 0,
+      address: teacher.address || '',
+      status: teacher.status || 'Active',
+      hire_date: teacher.hire_date || new Date().toISOString().split('T')[0]
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTeacher) return;
+    setSubmitting(true);
+    try {
+      await client.put(`/academics/teachers/${editingTeacher.id}`, {
+        ...editingTeacher,
+        experience_years: Number(editingTeacher.experience_years)
+      });
+      setIsEditModalOpen(false);
+      setEditingTeacher(null);
+      fetchTeachers();
+    } catch (err) {
+      console.error("Failed to update teacher", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteTeacher = async (teacherId: number, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete teacher "${name}"?`)) return;
+    try {
+      await client.delete(`/academics/teachers/${teacherId}`);
+      fetchTeachers();
+    } catch (err) {
+      console.error("Failed to delete teacher", err);
+    }
+  };
+
+  const filteredTeachers = teachers.filter((t: any) =>
     `${t.first_name} ${t.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (t.specialization && t.specialization.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (t.email && t.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    (t.email && t.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (t.status && t.status.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 font-sans text-left">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 flex items-center">
             <Users className="w-7 h-7 mr-2.5 text-emerald-600 shrink-0" />
-            Teachers Directory
+            Teachers Directory & Profile Management
           </h2>
-          <p className="text-xs text-slate-500 mt-1">Manage teaching staff profiles, academic qualifications, and contact information.</p>
+          <p className="text-xs text-slate-500 mt-1">Manage teaching staff profiles, edit status, academic qualifications, and contact details.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)} 
+        <button
+          onClick={() => setIsAddModalOpen(true)}
           className="btn-primary bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 text-white font-semibold py-2.5 px-5 rounded-xl transition-all"
         >
           + Add New Teacher
@@ -99,13 +141,13 @@ const TeachersView: React.FC = () => {
       </div>
 
       {/* Directory Card */}
-      <div className="card p-0 overflow-hidden border border-slate-200/80 shadow-sm rounded-2xl">
+      <div className="card p-0 overflow-hidden border border-slate-200/80 shadow-sm rounded-2xl bg-white">
         <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <div className="relative w-full max-w-xs">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search by name, subject, or email..." 
+            <input
+              type="text"
+              placeholder="Search by name, subject, status..."
               className="pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm w-full bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -113,7 +155,7 @@ const TeachersView: React.FC = () => {
           </div>
           <span className="text-xs font-semibold text-slate-500 hidden sm:inline-block">Total Teachers: {teachers.length}</span>
         </div>
-        
+
         <div className="overflow-x-auto">
           {loading ? (
             <div className="flex justify-center items-center h-48">
@@ -127,8 +169,9 @@ const TeachersView: React.FC = () => {
                   <th className="px-6 py-4 font-semibold">Specialization</th>
                   <th className="px-6 py-4 font-semibold">Contact Info</th>
                   <th className="px-6 py-4 font-semibold">Qualification</th>
-                  <th className="px-6 py-4 font-semibold">Status</th>
+                  <th className="px-6 py-4 font-semibold">Employment Status</th>
                   <th className="px-6 py-4 font-semibold">Hire Date</th>
+                  <th className="px-6 py-4 font-semibold text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -163,18 +206,46 @@ const TeachersView: React.FC = () => {
                       <div className="text-xs text-slate-400">{t.experience_years || 0} yrs exp.</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${t.status === 'Inactive' ? 'bg-slate-100 text-slate-600' : 'bg-emerald-100 text-emerald-800'}`}>
+                      <span
+                        className={`px-3 py-1 text-xs font-bold rounded-full ${
+                          t.status === 'On Leave'
+                            ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                            : t.status === 'Resigned'
+                            ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                            : t.status === 'Terminated'
+                            ? 'bg-slate-200 text-slate-700 border border-slate-300'
+                            : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                        }`}
+                      >
                         {t.status || 'Active'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-xs text-slate-500 font-medium">
                       {t.hire_date || 'N/A'}
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => handleOpenEditModal(t)}
+                          className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-colors"
+                          title="Edit Teacher Info & Status"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTeacher(t.id, `${t.first_name} ${t.last_name}`)}
+                          className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-colors"
+                          title="Delete Teacher"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
                 {filteredTeachers.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-10 text-center text-slate-500">No teachers found. Click "Add New Teacher" to register staff.</td>
+                    <td colSpan={7} className="px-6 py-10 text-center text-slate-500">No teachers found matching search criteria.</td>
                   </tr>
                 )}
               </tbody>
@@ -183,8 +254,8 @@ const TeachersView: React.FC = () => {
         </div>
       </div>
 
-      {/* Comprehensive Add Teacher Modal */}
-      {isModalOpen && (
+      {/* Add Teacher Modal */}
+      {isAddModalOpen && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto my-auto border border-slate-200">
             <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-100">
@@ -195,8 +266,8 @@ const TeachersView: React.FC = () => {
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">Enter complete personal, contact, and academic details for the staff profile.</p>
               </div>
-              <button 
-                onClick={() => setIsModalOpen(false)} 
+              <button
+                onClick={() => setIsAddModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
               >
                 <X className="w-6 h-6" />
@@ -210,8 +281,8 @@ const TeachersView: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
                       placeholder="e.g. John"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
@@ -221,8 +292,8 @@ const TeachersView: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
                       placeholder="e.g. Doe"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
@@ -232,7 +303,7 @@ const TeachersView: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
-                    <select 
+                    <select
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
                       value={newTeacher.gender}
                       onChange={(e) => setNewTeacher({...newTeacher, gender: e.target.value})}
@@ -243,8 +314,8 @@ const TeachersView: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">National ID</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="e.g. 1029384756"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.national_id}
@@ -260,8 +331,8 @@ const TeachersView: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       placeholder="e.g. teacher@school.edu"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.email}
@@ -270,8 +341,8 @@ const TeachersView: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
-                    <input 
-                      type="tel" 
+                    <input
+                      type="tel"
                       placeholder="e.g. +1 555 123 4567"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.phone_number}
@@ -279,26 +350,16 @@ const TeachersView: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div className="mt-3">
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Residential Address</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Building 12, Main Street, City"
-                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                    value={newTeacher.address}
-                    onChange={(e) => setNewTeacher({...newTeacher, address: e.target.value})}
-                  />
-                </div>
               </div>
 
               {/* Section 3: Professional & Employment Info */}
               <div>
-                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">3. Professional & Employment Details</h4>
+                <h4 className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider mb-3">3. Professional Details & Employment Status</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Specialization / Subject</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="e.g. Mathematics, Science, English"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.specialization}
@@ -306,8 +367,21 @@ const TeachersView: React.FC = () => {
                     />
                   </div>
                   <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Employment Status *</label>
+                    <select
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-emerald-50 text-emerald-900 border-emerald-300"
+                      value={newTeacher.status}
+                      onChange={(e) => setNewTeacher({...newTeacher, status: e.target.value})}
+                    >
+                      <option value="Active">Active (On Duty)</option>
+                      <option value="On Leave">On Leave (In Vacation)</option>
+                      <option value="Resigned">Resigned (Left)</option>
+                      <option value="Terminated">Terminated</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Qualification</label>
-                    <select 
+                    <select
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-white"
                       value={newTeacher.qualification}
                       onChange={(e) => setNewTeacher({...newTeacher, qualification: e.target.value})}
@@ -320,21 +394,12 @@ const TeachersView: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Years of Experience</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       min="0"
                       className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                       value={newTeacher.experience_years}
                       onChange={(e) => setNewTeacher({...newTeacher, experience_years: Number(e.target.value)})}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Hire Date</label>
-                    <input 
-                      type="date" 
-                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                      value={newTeacher.hire_date}
-                      onChange={(e) => setNewTeacher({...newTeacher, hire_date: e.target.value})}
                     />
                   </div>
                 </div>
@@ -342,20 +407,200 @@ const TeachersView: React.FC = () => {
 
               {/* Modal Action Buttons */}
               <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)} 
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
                   className="px-5 py-2.5 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 font-medium text-sm transition-colors"
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  disabled={submitting} 
+                <button
+                  type="submit"
+                  disabled={submitting}
                   className="btn-primary bg-emerald-600 hover:bg-emerald-700 shadow-md text-white font-semibold py-2.5 px-6 rounded-xl flex items-center text-sm transition-all"
                 >
                   {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Save Teacher
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Teacher Modal */}
+      {isEditModalOpen && editingTeacher && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto my-auto border border-slate-200">
+            <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-100">
+              <div>
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center">
+                  <Edit className="w-6 h-6 mr-2 text-blue-600" />
+                  Edit Teacher Profile & Status
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">Modify personal information, academic qualifications, and employment status.</p>
+              </div>
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateTeacher} className="space-y-6">
+              {/* Section 1: Employment Status Highlight */}
+              <div className="bg-blue-50/60 p-4 rounded-2xl border border-blue-200">
+                <label className="block text-xs font-bold text-blue-900 mb-1.5">Employment Status *</label>
+                <select
+                  className="w-full px-3.5 py-2.5 border border-blue-300 rounded-xl text-sm font-bold bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  value={editingTeacher.status}
+                  onChange={(e) => setEditingTeacher({...editingTeacher, status: e.target.value})}
+                >
+                  <option value="Active">Active (On Duty / regular)</option>
+                  <option value="On Leave">On Leave (In Vacation)</option>
+                  <option value="Resigned">Resigned (Left school)</option>
+                  <option value="Terminated">Terminated</option>
+                </select>
+                <p className="text-[11px] text-blue-700 mt-1">Changing the status will immediately update faculty reports and analytics.</p>
+              </div>
+
+              {/* Section 2: Personal Details */}
+              <div>
+                <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3">Personal Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.first_name}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, first_name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.last_name}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, last_name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
+                    <select
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 bg-white"
+                      value={editingTeacher.gender}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, gender: e.target.value})}
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">National ID</label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.national_id}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, national_id: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Contact Details */}
+              <div>
+                <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3">Contact Details</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.email}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, email: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                    <input
+                      type="tel"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.phone_number}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, phone_number: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: Professional Info */}
+              <div>
+                <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3">Professional Qualifications</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Specialization / Subject</label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.specialization}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, specialization: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Qualification</label>
+                    <select
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 bg-white"
+                      value={editingTeacher.qualification}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, qualification: e.target.value})}
+                    >
+                      <option value="Bachelor's Degree">Bachelor's Degree</option>
+                      <option value="Master's Degree">Master's Degree</option>
+                      <option value="PhD / Doctorate">PhD / Doctorate</option>
+                      <option value="Diploma">Diploma</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Years of Experience</label>
+                    <input
+                      type="number"
+                      min="0"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.experience_years}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, experience_years: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Hire Date</label>
+                    <input
+                      type="date"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      value={editingTeacher.hire_date}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, hire_date: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-5 py-2.5 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 font-medium text-sm transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl flex items-center text-sm transition-all shadow-md"
+                >
+                  {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Update Profile & Status
                 </button>
               </div>
             </form>

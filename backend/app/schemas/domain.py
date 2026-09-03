@@ -231,6 +231,20 @@ class TeacherProfileCreate(TeacherProfileBase):
     user_id: Optional[int] = None
     hire_date: Optional[date] = None
 
+class TeacherProfileUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    gender: Optional[str] = None
+    national_id: Optional[str] = None
+    specialization: Optional[str] = None
+    qualification: Optional[str] = None
+    experience_years: Optional[int] = None
+    address: Optional[str] = None
+    status: Optional[str] = None
+    hire_date: Optional[date] = None
+
 class TeacherProfileResponse(TeacherProfileBase):
     id: int
     user_id: Optional[int] = None
