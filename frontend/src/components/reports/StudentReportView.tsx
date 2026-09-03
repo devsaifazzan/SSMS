@@ -136,7 +136,11 @@ const StudentReportView: React.FC = () => {
             >
               <option value="all">All Academic Statuses</option>
               <option value="active">Active (Regular)</option>
-              <option value="at risk">At Risk (&lt;70% GPA)</option>
+              <option value="graduated">Graduated (متخرج)</option>
+              <option value="suspended">Suspended (موقوف مؤقتاً)</option>
+              <option value="transferred">Transferred (منتقل)</option>
+              <option value="withdrawn">Withdrawn (منسحب)</option>
+              <option value="at risk">At Risk (في خطر أكاديمي)</option>
             </select>
           </div>
 

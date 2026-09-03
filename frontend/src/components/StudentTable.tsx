@@ -8,6 +8,7 @@ interface Student {
   last_name: string;
   enrollment_date: string;
   user_id: number;
+  status?: string;
 }
 
 const StudentTable: React.FC = () => {
@@ -137,7 +138,8 @@ const StudentTable: React.FC = () => {
         national_id: editProfileStudent.national_id || null,
         address: editProfileStudent.address || null,
         phone_number: editProfileStudent.phone_number || null,
-        medical_conditions: editProfileStudent.medical_conditions || null
+        medical_conditions: editProfileStudent.medical_conditions || null,
+        status: editProfileStudent.status || 'Active'
       });
 
       if (selectedAcademicYearId && selectedSectionId) {
@@ -206,6 +208,7 @@ const StudentTable: React.FC = () => {
               <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
                 <th className="px-6 py-4 font-semibold">Student Name</th>
                 <th className="px-6 py-4 font-semibold">Enrollment Date</th>
+                <th className="px-6 py-4 font-semibold">Academic Status</th>
                 <th className="px-6 py-4 font-semibold text-right">Actions</th>
               </tr>
             </thead>
@@ -217,6 +220,25 @@ const StudentTable: React.FC = () => {
                     <div className="text-xs text-slate-400">ID: STU-{student.id.toString().padStart(4, '0')}</div>
                   </td>
                   <td className="px-6 py-4 text-slate-600 text-sm">{student.enrollment_date}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                        student.status === 'Graduated'
+                          ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                          : student.status === 'Suspended'
+                          ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                          : student.status === 'Transferred'
+                          ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                          : student.status === 'Withdrawn'
+                          ? 'bg-slate-200 text-slate-700 border border-slate-300'
+                          : student.status === 'At Risk'
+                          ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                          : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                      }`}
+                    >
+                      {student.status || 'Active'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end items-center space-x-2 opacity-100 transition-opacity">
                       <button 
@@ -333,6 +355,22 @@ const StudentTable: React.FC = () => {
               </button>
             </div>
             <form onSubmit={submitEditProfile} className="space-y-4">
+              <div className="bg-blue-50/60 p-3 rounded-xl border border-blue-200">
+                <label className="block text-xs font-bold text-blue-900 mb-1">Academic / Enrollment Status *</label>
+                <select
+                  value={editProfileStudent.status || 'Active'}
+                  onChange={e => setEditProfileStudent({...editProfileStudent, status: e.target.value})}
+                  className="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900"
+                >
+                  <option value="Active">Active (منتظم)</option>
+                  <option value="Graduated">Graduated (متخرج)</option>
+                  <option value="Suspended">Suspended (موقوف مؤقتاً)</option>
+                  <option value="Transferred">Transferred (منتقل)</option>
+                  <option value="Withdrawn">Withdrawn (منسحب / طارد)</option>
+                  <option value="At Risk">At Risk (في خطر أكاديمي)</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">First Name</label>

@@ -96,6 +96,7 @@ class StudentProfile(Base):
     address: Mapped[Optional[str]] = mapped_column(Text)
     phone_number: Mapped[Optional[str]] = mapped_column(String(20))
     medical_conditions: Mapped[Optional[str]] = mapped_column(Text)
+    status: Mapped[Optional[str]] = mapped_column(String(50), default="Active")
 
     user: Mapped[User] = relationship(back_populates="student_profile")
     enrollments: Mapped[List["Enrollment"]] = relationship(back_populates="student")

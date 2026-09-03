@@ -62,6 +62,7 @@ class StudentProfileBase(BaseModel):
     address: Optional[str] = None
     phone_number: Optional[str] = None
     medical_conditions: Optional[str] = None
+    status: Optional[str] = "Active"
 
 class StudentProfileCreate(StudentProfileBase):
     user_id: int
@@ -77,6 +78,7 @@ class StudentProfileUpdate(BaseModel):
     address: Optional[str] = None
     phone_number: Optional[str] = None
     medical_conditions: Optional[str] = None
+    status: Optional[str] = None
 
 class StudentProfileResponse(StudentProfileBase):
     id: int
