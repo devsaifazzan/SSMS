@@ -3,7 +3,12 @@ import MainLayout from './components/MainLayout'
 import DashboardView from './components/DashboardView'
 import StudentsView from './components/StudentsView'
 import TimetableView from './components/TimetableView'
-import ReportsView from './components/ReportsView'
+import ReportsOverview from './components/reports/ReportsOverview'
+import StudentReportView from './components/reports/StudentReportView'
+import TeacherReportView from './components/reports/TeacherReportView'
+import AttendanceReportView from './components/reports/AttendanceReportView'
+import AcademicReportView from './components/reports/AcademicReportView'
+import FinanceReportView from './components/reports/FinanceReportView'
 import SettingsView from './components/SettingsView'
 import LoginView from './components/LoginView'
 import GradesView from './components/GradesView'
@@ -20,7 +25,7 @@ const AppRoutes = () => {
   const { isAuthenticated, isLoading, login, logout } = useAuth();
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center font-arabic">جاري التحميل...</div>;
+    return <div className="min-h-screen flex items-center justify-center font-sans">Loading...</div>;
   }
 
   if (!isAuthenticated) {
@@ -42,7 +47,15 @@ const AppRoutes = () => {
           <Route path="teachers" element={<TeachersView />} />
           <Route path="timetable" element={<TimetableView />} />
           <Route path="grades" element={<GradesView />} />
-          <Route path="reports" element={<ReportsView />} />
+
+          {/* Sub-routes under reports */}
+          <Route path="reports" element={<ReportsOverview />} />
+          <Route path="reports/students" element={<StudentReportView />} />
+          <Route path="reports/teachers" element={<TeacherReportView />} />
+          <Route path="reports/attendance" element={<AttendanceReportView />} />
+          <Route path="reports/grades" element={<AcademicReportView />} />
+          <Route path="reports/finance" element={<FinanceReportView />} />
+
           <Route path="finance" element={<FinanceView />} />
           <Route path="academics" element={<AcademicsView />} />
           <Route path="settings" element={<SettingsView />} />
